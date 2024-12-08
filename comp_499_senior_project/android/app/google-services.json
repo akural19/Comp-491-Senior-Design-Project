@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "330383229148",
+    "project_id": "sign-speak-app-aff74",
+    "storage_bucket": "sign-speak-app-aff74.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:330383229148:android:c147743a94600d7762f419",
+        "android_client_info": {
+          "package_name": "com.example.comp_499_senior_project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "330383229148-b3rl8t7ub57oat2qpsbif2sj7rn6mh4o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.comp_499_senior_project",
+            "certificate_hash": "3503e8b7209c9bea1c928e1d4edf8badc1d7a98f"
+          }
+        },
+        {
+          "client_id": "330383229148-un8cf2la8677rptoe1odch9rlohc2epu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFIhlfmLI5wn-tQik3O8eerPDzhCPypx4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "330383229148-un8cf2la8677rptoe1odch9rlohc2epu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "330383229148-6s30o2a2kmsp47o63gmv684caidt1j8p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.comp499.senior-project.sign-speak"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
