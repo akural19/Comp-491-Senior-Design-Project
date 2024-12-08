@@ -86,6 +86,11 @@ PODS:
   - permission_handler_apple (9.3.0):
     - Flutter
   - RecaptchaInterop (100.0.0)
+  - speech_to_text (0.0.1):
+    - Flutter
+    - FlutterMacOS
+    - Try
+  - Try (2.1.1)
 
 DEPENDENCIES:
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
@@ -95,6 +100,7 @@ DEPENDENCIES:
   - google_sign_in_ios (from `.symlinks/plugins/google_sign_in_ios/darwin`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - speech_to_text (from `.symlinks/plugins/speech_to_text/darwin`)
 
 SPEC REPOS:
   trunk:
@@ -112,6 +118,7 @@ SPEC REPOS:
     - GTMAppAuth
     - GTMSessionFetcher
     - RecaptchaInterop
+    - Try
 
 EXTERNAL SOURCES:
   firebase_auth:
@@ -128,6 +135,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
+  speech_to_text:
+    :path: ".symlinks/plugins/speech_to_text/darwin"
 
 SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
@@ -151,6 +160,8 @@ SPEC CHECKSUMS:
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
+  speech_to_text: 627d3fd2194770b51abb324ba45c2d39398f24a8
+  Try: 5ef669ae832617b3cee58cb2c6f99fb767a4ff96
 
 PODFILE CHECKSUM: b4421a3af291becd7f520b9d2111c40d173a8942
 

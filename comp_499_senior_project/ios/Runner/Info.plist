@@ -71,5 +71,7 @@
     <string>We need camera access to capture photos and videos.</string>
     <key>NSDocumentsUsageDescription</key>
     <string>We need access to your files to save and read data.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>We need access to your speech recognition for transcribing your speech.</string>
 </dict>
 </plist>

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import 'real_time_transcription_page.dart';
 import 'recording_page.dart'; // Import the recording page
 import 'sign_in_screen.dart';
 
@@ -67,6 +68,22 @@ class HomePage extends StatelessWidget {
               child: FeatureCard(
                 icon: Icons.account_tree_outlined,
                 title: 'Sign to Text Converter',
+                color: Colors.blue.shade700,
+              ),
+            ),
+            const SizedBox(height: 16),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const RealTimeTranscriptionPage(),
+                  ),
+                );
+              },
+              child: FeatureCard(
+                icon: Icons.record_voice_over_outlined,
+                title: 'Real-Time Transcription',
                 color: Colors.blue.shade700,
               ),
             ),
