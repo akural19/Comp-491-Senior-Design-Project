@@ -418,49 +418,62 @@ class _RecordingPageState extends State<RecordingPage> {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          String selectedLanguage =
-              _selectedLanguage; // Temporary variable for dialog state
-          return AlertDialog(
-            title: const Text("Select Language"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                DropdownButton<String>(
-                  value: selectedLanguage,
-                  isExpanded: true,
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      selectedLanguage = newValue;
-                    }
-                  },
-                  items: const [
-                    DropdownMenuItem<String>(
-                      value: "tr-TR",
-                      child: Text("Turkish"),
-                    ),
-                    DropdownMenuItem<String>(
-                      value: "en-US",
-                      child: Text("English"),
+          String tempSelectedLanguage =
+              _selectedLanguage; // Use current language as the default
+          return StatefulBuilder(
+            builder: (context, setDialogState) {
+              return AlertDialog(
+                title: const Text("Select Language"),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButton<String>(
+                      value: tempSelectedLanguage,
+                      isExpanded: true,
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          setDialogState(() {
+                            tempSelectedLanguage =
+                                newValue; // Update temporary selection
+                          });
+                        }
+                      },
+                      items: const [
+                        DropdownMenuItem<String>(
+                          value: "tr-TR",
+                          child: Text("Turkish"),
+                        ),
+                        DropdownMenuItem<String>(
+                          value: "en-US",
+                          child: Text("English"),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                const SizedBox(
-                    height: 16), // Add spacing between dropdown and button
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _selectedLanguage = selectedLanguage;
-                    });
-                    Navigator.of(context).pop();
-                    _startTranscription(); // Start transcription after language selection
-                  },
-                  child: const Text(
-                    "Start Transcription",
-                    style: TextStyle(fontSize: 16),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _selectedLanguage =
+                            tempSelectedLanguage; // Confirm and save selection
+                      });
+                      print("Selected language confirmed: $_selectedLanguage");
+                      Navigator.of(context).pop(); // Close the dialog
+                      _startTranscription(); // Start transcription with the selected language
+                    },
+                    child: const Text("Confirm"),
                   ),
-                ),
-              ],
-            ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pop(); // Close dialog without changing
+                    },
+                    child: const Text("Cancel"),
+                  ),
+                ],
+              );
+            },
           );
         },
       );
