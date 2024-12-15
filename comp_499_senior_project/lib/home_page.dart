@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'real_time_transcription_page.dart';
 import 'recording_page.dart'; // Import the recording page
 import 'sign_in_screen.dart';
+import 'video_recording_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -64,6 +65,11 @@ class HomePage extends StatelessWidget {
             GestureDetector(
               onTap: () {
                 // Navigate to Sign to Text Converter page (to be implemented)
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const VideoRecordingPage()),
+                );
               },
               child: FeatureCard(
                 icon: Icons.account_tree_outlined,

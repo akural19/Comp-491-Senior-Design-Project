@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home_page.dart';
+import 'onboarding_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -40,9 +42,26 @@ class _SignInScreenState extends State<SignInScreen> {
 
       await _auth.signInWithCredential(credential);
 
+      // Check if onboarding has been shown before
+      final prefs = await SharedPreferences.getInstance();
+      final showOnboarding = prefs.getBool('showOnboarding') ?? true;
+
+      if (showOnboarding) {
+        // Navigate to OnboardingScreen
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => OnboardingScreen()),
+        );
+      } else {
+        // Navigate to HomePage
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      }
+      /*
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => HomePage()),
       );
+       */
     } catch (e) {
       _showError("Google Sign-In failed. Please try again.");
     } finally {
