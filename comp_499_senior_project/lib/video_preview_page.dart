@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:comp_499_senior_project/sign_recognition_result.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -165,6 +166,7 @@ class _VideoPreviewPageState extends State<VideoPreviewPage> {
     }
   }
 
+  /*
   Future<void> _displaySignLanguageRecognitionResult(
       Map<String, dynamic> result) async {
     setState(() {
@@ -219,6 +221,70 @@ class _VideoPreviewPageState extends State<VideoPreviewPage> {
               ],
             );
           },
+        );
+      }
+    } catch (e) {
+      // Close the progress dialog if open
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+
+      // Show an error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } finally {
+      setState(() {
+        _isProcessing = false;
+      });
+    }
+  }
+  */
+
+  Future<void> _displaySignLanguageRecognitionResult(
+      Map<String, dynamic> result) async {
+    setState(() {
+      _isProcessing = true;
+    });
+
+    try {
+      // Show progress dialog
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return const Dialog(
+              child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 20),
+                    Text(
+                      'Processing video...',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      }
+
+      // Navigate to the new SignLanguageRecognitionResultPage
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => SignLanguageRecognitionResultPage(
+              videoPath: widget.videoPath,
+              result: result,
+            ),
+          ),
         );
       }
     } catch (e) {
