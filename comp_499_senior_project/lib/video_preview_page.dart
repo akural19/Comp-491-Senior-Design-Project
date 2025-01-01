@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-import 'sign_recognition_result.dart';
 import 'sign_recognition_service.dart';
 
 class VideoPreviewPage extends StatefulWidget {
@@ -18,6 +17,7 @@ class VideoPreviewPage extends StatefulWidget {
 class _VideoPreviewPageState extends State<VideoPreviewPage> {
   late VideoPlayerController _videoPlayerController;
   bool _isUploading = false;
+  bool _isProcessing = false;
 
   @override
   void initState() {
@@ -102,12 +102,12 @@ class _VideoPreviewPageState extends State<VideoPreviewPage> {
     }
   }
    */
+
   Future<void> _uploadVideo() async {
     setState(() {
       _isUploading = true;
     });
 
-    int retryCount = 0;
     try {
       // Show upload progress dialog
       if (mounted) {
@@ -115,32 +115,17 @@ class _VideoPreviewPageState extends State<VideoPreviewPage> {
           context: context,
           barrierDismissible: false,
           builder: (BuildContext context) {
-            return WillPopScope(
-              onWillPop: () async => false,
-              child: Dialog(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const CircularProgressIndicator(),
-                      const SizedBox(height: 20),
-                      StatefulBuilder(
-                        builder: (context, setState) {
-                          String message = 'Uploading video and processing...';
-                          if (retryCount > 0) {
-                            message +=
-                                '\nRetry attempt $retryCount of ${SignRecognitionService.maxRetries}';
-                          }
-                          return Text(
-                            message,
-                            style: const TextStyle(color: Colors.white),
-                            textAlign: TextAlign.center,
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+            return const Dialog(
+              child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 20),
+                    Text('Uploading video and processing...',
+                        style: TextStyle(color: Colors.white)),
+                  ],
                 ),
               ),
             );
@@ -149,8 +134,10 @@ class _VideoPreviewPageState extends State<VideoPreviewPage> {
       }
 
       // Upload video and get result
-      final result =
+      int videoId =
           await SignRecognitionService.uploadVideo(File(widget.videoPath));
+      Map<String, dynamic> result =
+          await SignRecognitionService.getResult(videoId);
 
       // Close progress dialog
       if (mounted) {
@@ -158,44 +145,17 @@ class _VideoPreviewPageState extends State<VideoPreviewPage> {
       }
 
       // Navigate to result screen
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => SignRecognitionResult(result: result),
-          ),
-        );
-      }
+      _displaySignLanguageRecognitionResult(result);
     } catch (e) {
       // Close progress dialog if open
       if (mounted) {
         Navigator.of(context).pop();
       }
 
-      // Show error message with retry option
+      // Show error message
       if (mounted) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Upload Error'),
-              content: Text(e.toString()),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    _uploadVideo(); // Retry upload
-                  },
-                  child: const Text('Retry'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Cancel'),
-                ),
-              ],
-            );
-          },
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
         );
       }
     } finally {
@@ -205,89 +165,80 @@ class _VideoPreviewPageState extends State<VideoPreviewPage> {
     }
   }
 
-  /*
-  @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+  Future<void> _displaySignLanguageRecognitionResult(
+      Map<String, dynamic> result) async {
+    setState(() {
+      _isProcessing = true;
+    });
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Video Preview"),
-      ),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              Expanded(
-                child: _videoPlayerController.value.isInitialized
-                    ? AspectRatio(
-                        aspectRatio: _videoPlayerController.value.aspectRatio,
-                        child: VideoPlayer(_videoPlayerController),
-                      )
-                    : const Center(child: CircularProgressIndicator()),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: screenHeight * 0.02,
-                  horizontal: screenWidth * 0.05,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    try {
+      // Show progress dialog
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return const Dialog(
+              child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.of(context).pop(false);
-                      },
-                      icon: const Icon(Icons.delete),
-                      label: const Text("Discard"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        minimumSize:
-                            Size(screenWidth * 0.35, screenHeight * 0.06),
-                      ),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: _isUploading ? null : _uploadVideo,
-                      icon: const Icon(Icons.cloud_upload),
-                      label: Text(
-                          _isUploading ? "Uploading..." : "Upload & Process"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        minimumSize:
-                            Size(screenWidth * 0.35, screenHeight * 0.06),
-                      ),
+                    CircularProgressIndicator(),
+                    SizedBox(height: 20),
+                    Text(
+                      'Processing video...',
+                      style: TextStyle(color: Colors.white),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
-          Positioned(
-            bottom: screenHeight * 0.12,
-            right: screenWidth * 0.05,
-            child: FloatingActionButton(
-              onPressed: () {
-                if (_videoPlayerController.value.isPlaying) {
-                  _videoPlayerController.pause();
-                } else {
-                  _videoPlayerController.play();
-                }
-                setState(() {});
-              },
-              backgroundColor: Colors.purple,
-              child: Icon(
-                _videoPlayerController.value.isPlaying
-                    ? Icons.pause
-                    : Icons.play_arrow,
+            );
+          },
+        );
+      }
+
+      // Display the sign language recognition result
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Sign Language Recognition Result'),
+              content: Text(
+                result['result'] ?? 'null',
+                style: const TextStyle(fontFamily: 'MonospaceFont'),
               ),
-            ),
-          ),
-        ],
-      ),
-    );
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e) {
+      // Close the progress dialog if open
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+
+      // Show an error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } finally {
+      setState(() {
+        _isProcessing = false;
+      });
+    }
   }
-   */
 
   @override
   Widget build(BuildContext context) {

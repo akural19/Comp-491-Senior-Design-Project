@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
+import 'package:comp_499_senior_project/sign_recognition_service.dart';
 import 'package:comp_499_senior_project/video_preview_page.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -22,6 +25,27 @@ class _VideoRecordingPageState extends State<VideoRecordingPage> {
   void initState() {
     super.initState();
     _checkPermissionsAndInitializeCamera();
+  }
+
+  Future<void> _processVideo(File videoFile) async {
+    try {
+      print('Video upload starting: ${videoFile.path}');
+
+      var videoId = await SignRecognitionService.uploadVideo(videoFile);
+      //var videoId = json.decode(uploadResponse)['id'];
+
+      print('Video uploaded. ID: $videoId');
+
+      var result = await SignRecognitionService.getResult(videoId);
+      print('Processing result: ${result['result']}');
+
+      // Display the result in the UI or navigate to a result screen
+      // ...
+    } catch (e) {
+      print('Error processing video: $e');
+      // Handle the error in the UI
+      // ...
+    }
   }
 
   /// Check Permissions and Initialize Camera
@@ -118,12 +142,18 @@ class _VideoRecordingPageState extends State<VideoRecordingPage> {
   }
 
   /// Navigate to Video Preview Screen
-  void _navigateToVideoPreview(String videoPath) {
-    Navigator.of(context).push(
+  void _navigateToVideoPreview(String videoPath) async {
+    var result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => VideoPreviewPage(videoPath: videoPath),
       ),
     );
+
+    if (result == true) {
+      // User saved the video, process it
+      var videoFile = File(videoPath);
+      await _processVideo(videoFile);
+    }
   }
 
   /// Show SnackBar for Permission Denied
@@ -158,103 +188,6 @@ class _VideoRecordingPageState extends State<VideoRecordingPage> {
     _cameraController?.dispose();
     super.dispose();
   }
-
-  /*
-  @override
-  Widget build(BuildContext context) {
-    final isInitialized =
-        _cameraController != null && _cameraController!.value.isInitialized;
-
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Camera Preview
-          if (isInitialized)
-            CameraPreview(_cameraController!)
-          else
-            const Center(child: CircularProgressIndicator()),
-
-          // Back Button
-          Align(
-            alignment: Alignment.topLeft,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(5.00, 25.00, 5.00, 25.00),
-              child: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.white,
-                  size: 30,
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop(); // Navigate back to the main page
-                },
-              ),
-            ),
-          ),
-
-          // Record Button
-          if (isInitialized)
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 24.0),
-                child: GestureDetector(
-                  onTap: _startOrStopRecording,
-                  child: CircleAvatar(
-                    radius: 36,
-                    backgroundColor: _isRecording ? Colors.red : Colors.green,
-                    child: Icon(
-                      _isRecording ? Icons.stop : Icons.videocam,
-                      size: 32,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-          // Front-Back Camera Switch Button
-          if (isInitialized)
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 34.0, right: 34.0),
-                child: FloatingActionButton(
-                  onPressed: _switchCamera,
-                  mini: true,
-                  backgroundColor: Colors.grey[800],
-                  child: const Icon(Icons.cameraswitch, color: Colors.white),
-                ),
-              ),
-            ),
-
-          // Overlay: Save Location (optional, displayed briefly)
-
-          /*
-          if (_recordedVideo != null)
-            Positioned(
-              bottom: 80,
-              left: 16,
-              right: 16,
-              child: Container(
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: Text(
-                  "Saved: ${_recordedVideo!.path}",
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ),
-            ),
-           */
-        ],
-      ),
-    );
-  }
-   */
 
   @override
   Widget build(BuildContext context) {

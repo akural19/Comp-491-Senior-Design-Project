@@ -1,40 +1,40 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 class SignRecognitionService {
   static const String baseUrl =
       'https://sign-recognizer-ca63fe2f6b41.herokuapp.com';
-  static const int maxRetries = 3;
-  static const Duration retryDelay = Duration(seconds: 3);
+  static const int maxRetries = 30;
+  static const Duration retryDelay = Duration(seconds: 2);
 
-  static Future<String> uploadVideo(File videoFile) async {
+  static Future<int> uploadVideo(File videoFile) async {
     int retryCount = 0;
     Exception? lastException;
 
     while (retryCount < maxRetries) {
       try {
-        // Create multipart request with the correct endpoint
         var request =
             http.MultipartRequest('POST', Uri.parse('$baseUrl/api/upload/'));
 
-        // Add file to request
         var videoStream = http.ByteStream(videoFile.openRead());
         var length = await videoFile.length();
 
-        // Create the multipart file with the correct field name 'video'
         var multipartFile = http.MultipartFile(
-            'video', // Field name changed to 'video'
-            videoStream,
-            length,
-            filename: videoFile.path.split('/').last);
+          'video',
+          videoStream,
+          length,
+          filename: videoFile.path.split('/').last,
+          contentType: MediaType('video', 'mp4'),
+        );
 
         request.files.add(multipartFile);
 
-        // Add necessary headers
         request.headers.addAll({
-          'Accept': '*/*',
+          'Accept': 'application/json',
           'Content-Type': 'multipart/form-data',
         });
 
@@ -44,7 +44,6 @@ class SignRecognitionService {
         print('File size: $length bytes');
         print('Headers: ${request.headers}');
 
-        // Send request with timeout
         var streamedResponse = await request.send().timeout(
           const Duration(seconds: 60),
           onTimeout: () {
@@ -58,7 +57,8 @@ class SignRecognitionService {
         print('Response body: ${response.body}');
 
         if (response.statusCode == 200 || response.statusCode == 201) {
-          return response.body;
+          Map<String, dynamic> responseData = json.decode(response.body);
+          return responseData['id'];
         } else {
           throw Exception(
               'Server returned status code: ${response.statusCode}\nResponse: ${response.body}');
@@ -79,5 +79,37 @@ class SignRecognitionService {
 
     throw Exception(
         'Failed after $maxRetries attempts. Last error: $lastException');
+  }
+
+  static Future<Map<String, dynamic>> getResult(int videoId) async {
+    String statusUrl = '$baseUrl/api/status/$videoId/';
+
+    for (int attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        http.Response response = await http.get(Uri.parse(statusUrl));
+        if (response.statusCode == 200) {
+          Map<String, dynamic> result = json.decode(response.body);
+
+          if (result['status'] == 'completed') {
+            return result;
+          } else if (result['status'] == 'failed') {
+            throw Exception(
+                'Video processing failed: ${result['result'] ?? 'Unknown error'}');
+          }
+
+          print(
+              'Video is being processed... Attempt ${attempt + 1}/$maxRetries');
+          await Future.delayed(retryDelay);
+        } else {
+          print("Serkan bak buraya girdi");
+          throw Exception('Request failed with status: ${response.statusCode}');
+        }
+      } catch (e) {
+        print('Error getting result: $e');
+        rethrow;
+      }
+    }
+
+    throw TimeoutException('Video processing timed out');
   }
 }
