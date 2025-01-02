@@ -82,6 +82,7 @@ class _VideoRecordingPageState extends State<VideoRecordingPage> {
     _cameraController = CameraController(
       camera,
       ResolutionPreset.medium,
+      enableAudio: false,
     );
 
     await _cameraController!.initialize();

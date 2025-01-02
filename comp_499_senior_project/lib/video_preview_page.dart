@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:comp_499_senior_project/sign_recognition_result.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:video_player/video_player.dart';
 
 import 'sign_recognition_service.dart';
@@ -275,14 +277,15 @@ class _VideoPreviewPageState extends State<VideoPreviewPage> {
           },
         );
       }
-
+      // Fetch the GPT API response
+      String correctedText = await _fetchGPTResponse(result['result']);
       // Navigate to the new SignLanguageRecognitionResultPage
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => SignLanguageRecognitionResultPage(
               videoPath: widget.videoPath,
-              result: result,
+              result: correctedText,
             ),
           ),
         );
@@ -303,6 +306,51 @@ class _VideoPreviewPageState extends State<VideoPreviewPage> {
       setState(() {
         _isProcessing = false;
       });
+    }
+  }
+
+  Future<String> _fetchGPTResponse(String text) async {
+    final apiKey =
+        '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';
+    final apiUrl = 'https://api.openai.com/v1/chat/completions';
+
+    try {
+      // Build the request payload
+      final requestBody = jsonEncode({
+        "model": "gpt-4",
+        "messages": [
+          {
+            "role": "system",
+            "content":
+                "You are an expert in converting sign language videos to text. I will provide you with text extracted from a sign language video using our model. The model has some deficiencies, and your task is to identify and correct any mistakes based on the context while strictly maintaining the letter count of the original text. Specifically, our model may confuse the letters 'i' and 'j'—sometimes it outputs the correct letter, and other times it does not. Your responsibility is to review the text carefully and determine the correct letter based on the context while ensuring the total number of characters in each word remains unchanged. If null or no hand is detected, do not do anything and return the same input as output."
+          },
+          {"role": "user", "content": "The text for correction: $text"}
+        ],
+        "max_tokens": 100,
+        "temperature": 0.5,
+      });
+
+      // Make the POST request
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          "Authorization": "Bearer $apiKey",
+          "Content-Type": "application/json",
+        },
+        body: requestBody,
+      );
+
+      // Handle the response
+      if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+        final reply = responseBody['choices'][0]['message']['content'].trim();
+        return reply;
+      } else {
+        throw Exception(
+            "Failed to fetch GPT response: ${response.statusCode}, ${response.body}");
+      }
+    } catch (e) {
+      throw Exception("Error in GPT request: $e");
     }
   }
 
