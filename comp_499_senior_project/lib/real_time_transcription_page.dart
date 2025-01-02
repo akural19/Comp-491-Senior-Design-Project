@@ -202,8 +202,19 @@ class _RealTimeTranscriptionPageState extends State<RealTimeTranscriptionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Real-Time Transcription"),
+        title: const Text(
+          "Real-Time Transcription",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: const Color(0xFF12182A),
+        centerTitle: true,
+        elevation: 4,
       ),
+      backgroundColor: const Color(0xFF12182A),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -252,7 +263,8 @@ class _RealTimeTranscriptionPageState extends State<RealTimeTranscriptionPage> {
                     child: FloatingActionButton(
                       onPressed:
                           _isListening ? _stopListening : _startListening,
-                      backgroundColor: _isListening ? Colors.red : Colors.green,
+                      backgroundColor:
+                          _isListening ? Colors.red : const Color(0xFF3C83F7),
                       child: Icon(
                         _isListening ? Icons.mic_off : Icons.mic,
                         size:

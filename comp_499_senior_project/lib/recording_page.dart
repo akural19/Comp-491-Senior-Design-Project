@@ -16,7 +16,8 @@ class RecordingPage extends StatefulWidget {
   State<RecordingPage> createState() => _RecordingPageState();
 }
 
-class _RecordingPageState extends State<RecordingPage> {
+class _RecordingPageState extends State<RecordingPage>
+    with SingleTickerProviderStateMixin {
   final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
   bool _isRecording = false; // Tracks if recording is active
   String? _recordingPath; // Path to save the recorded file
@@ -26,6 +27,7 @@ class _RecordingPageState extends State<RecordingPage> {
   final String apiKey =
       'd166c6edfc36e49e6bd9f2bca6f2955c29cb66672b5decc4e52d1be935f0f72719478c626e0e0ef62125d5e867f8e46c645e6e69650372ebccace84371e2d746'; // Replace with your actual API key
 
+  late AnimationController _animationController;
   bool _isTranscribing = false;
   String _selectedLanguage = "tr-TR";
 
@@ -35,6 +37,14 @@ class _RecordingPageState extends State<RecordingPage> {
   void initState() {
     super.initState();
     _initializeRecorder();
+    _initializeAnimationController();
+  }
+
+  Future<void> _initializeAnimationController() async {
+    _animationController = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat(reverse: true);
   }
 
   Future<void> _initializeRecorder() async {
@@ -55,6 +65,7 @@ class _RecordingPageState extends State<RecordingPage> {
   void dispose() {
     _recorder.closeRecorder();
     _timer?.cancel();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -68,6 +79,7 @@ class _RecordingPageState extends State<RecordingPage> {
       // Pause recording
       await _recorder.pauseRecorder();
       _timer?.cancel();
+      _animationController.stop();
     } else {
       // Request permissions
       final hasPermission = await _requestPermissions();
@@ -97,6 +109,7 @@ class _RecordingPageState extends State<RecordingPage> {
       }
 
       _startTimer();
+      _animationController.repeat(reverse: true);
     }
 
     setState(() {
@@ -180,17 +193,19 @@ class _RecordingPageState extends State<RecordingPage> {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    final stopwatch = Stopwatch()..start();
+    _timer = Timer.periodic(const Duration(milliseconds: 10), (timer) {
       setState(() {
-        _recordingDuration++;
+        _recordingDuration = stopwatch.elapsedMilliseconds;
       });
     });
   }
 
-  String _formatDuration(int seconds) {
-    final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
-    final secs = (seconds % 60).toString().padLeft(2, '0');
-    return "$minutes:$secs";
+  String _formatDuration(int milliseconds) {
+    final minutes = (milliseconds ~/ 60000).toString().padLeft(2, '0');
+    final seconds = ((milliseconds % 60000) ~/ 1000).toString().padLeft(2, '0');
+    final millis = ((milliseconds % 1000) ~/ 10).toString().padLeft(2, '0');
+    return "$minutes:$seconds.$millis";
   }
 
   Future<void> _uploadAndTranscribe(File file, String language) async {
@@ -350,8 +365,19 @@ class _RecordingPageState extends State<RecordingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Speech to Text Converter"),
+        title: const Text(
+          "Speech to Text Converter",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: const Color(0xFF12182A),
+        centerTitle: true,
+        elevation: 4,
       ),
+      backgroundColor: const Color(0xFF12182A),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -359,6 +385,7 @@ class _RecordingPageState extends State<RecordingPage> {
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                /*
                 children: [
                   // Timer Counter
                   Text(
@@ -386,6 +413,60 @@ class _RecordingPageState extends State<RecordingPage> {
                     ),
                   ),
                 ],
+                 */
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text:
+                              _formatDuration(_recordingDuration).split('.')[0],
+                          style: const TextStyle(
+                            fontSize: 48,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        TextSpan(
+                          text:
+                              '.${_formatDuration(_recordingDuration).split('.')[1]}',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white.withOpacity(0.7),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  if (_animationController != null)
+                    ScaleTransition(
+                      scale: _animationController.isAnimating
+                          ? Tween(begin: 1.0, end: 1.2).animate(
+                              CurvedAnimation(
+                                parent: _animationController,
+                                curve: Curves.easeInOut,
+                              ),
+                            )
+                          : AlwaysStoppedAnimation(1.0),
+                      child: ElevatedButton(
+                        onPressed: _startOrPauseRecording,
+                        style: ElevatedButton.styleFrom(
+                          shape: const CircleBorder(),
+                          padding: const EdgeInsets.all(20),
+                          backgroundColor: _isRecording
+                              ? Colors.red
+                              : const Color(0xFF3C83F7),
+                        ),
+                        child: Icon(
+                          _isRecording ? Icons.pause : Icons.mic,
+                          size: 48,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),
@@ -398,13 +479,25 @@ class _RecordingPageState extends State<RecordingPage> {
                 _stopAndTranscribe();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: const Color(0xFF3C83F7),
                 padding: const EdgeInsets.symmetric(
-                    vertical: 20.0, horizontal: 30.0),
+                  vertical: 20.0,
+                  horizontal: 30.0,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                //backgroundColor: Colors.blue,
+                //padding: const EdgeInsets.symmetric(
+                //vertical: 20.0, horizontal: 30.0),
               ),
               child: const Text(
                 "Stop & Transcribe",
-                style: TextStyle(fontSize: 20, color: Colors.white),
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),

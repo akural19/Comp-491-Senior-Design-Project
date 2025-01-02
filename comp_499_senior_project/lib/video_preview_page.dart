@@ -359,9 +359,9 @@ class _VideoPreviewPageState extends State<VideoPreviewPage> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.grey[800], // Updated to match home page
+      backgroundColor: const Color(0xFF12182A), // Updated to match home page
       appBar: AppBar(
-        backgroundColor: Colors.grey[800], // Updated to match home page
+        backgroundColor: const Color(0xFF12182A), // Updated to match home page
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -407,7 +407,8 @@ class _VideoPreviewPageState extends State<VideoPreviewPage> {
                     width: 60,
                     height: 60,
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade700, // Updated to match home page
+                      color:
+                          const Color(0xFF3C83F7), // Updated to match home page
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: IconButton(
@@ -473,8 +474,8 @@ class _VideoPreviewPageState extends State<VideoPreviewPage> {
                     child: ElevatedButton.icon(
                       onPressed: _isUploading ? null : _uploadVideo,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Colors.blue.shade700, // Updated to match home page
+                        backgroundColor: const Color(
+                            0xFF3C83F7), // Updated to match home page
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(

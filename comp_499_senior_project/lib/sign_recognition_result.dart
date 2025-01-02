@@ -271,7 +271,8 @@ class _SignLanguageRecognitionResultPageState
         body: jsonEncode({
           "model": "tts-1",
           "voice": "alloy",
-          "input": text,
+          "input":
+              text.split(':').length > 1 ? text.split(':')[1].trim() : text,
         }),
       );
 
@@ -313,7 +314,9 @@ class _SignLanguageRecognitionResultPageState
           fit: BoxFit.scaleDown,
           child: Text('Sign Language Recognition'),
         ),
+        backgroundColor: const Color(0xFF12182A),
       ),
+      backgroundColor: const Color(0xFF12182A),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -326,7 +329,8 @@ class _SignLanguageRecognitionResultPageState
             ),
             const SizedBox(height: 8),
             Text(
-              widget.result,
+              widget.result
+                  .replaceFirst("The corrected text:", "The Depicted Text:"),
               style: const TextStyle(fontFamily: 'MonospaceFont'),
             ),
             const SizedBox(height: 20),
@@ -341,7 +345,7 @@ class _SignLanguageRecognitionResultPageState
                   style: const TextStyle(color: Colors.white),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: const Color(0xFF3C83F7),
                 ),
               ),
             ),
