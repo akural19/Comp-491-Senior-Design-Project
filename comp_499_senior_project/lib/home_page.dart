@@ -14,7 +14,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Sign-Speak Communication Assistant',
+          'Communication Assistant',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         actions: [
@@ -55,7 +55,7 @@ class HomePage extends StatelessWidget {
               },
               child: FeatureCard(
                 icon: Icons.keyboard_voice_outlined,
-                title: 'Speech to Text Converter',
+                title: 'Advanced Transcription',
                 color: Colors.blue.shade700,
               ),
             ),
@@ -73,7 +73,7 @@ class HomePage extends StatelessWidget {
               },
               child: FeatureCard(
                 icon: Icons.account_tree_outlined,
-                title: 'Sign to Text Converter',
+                title: 'Sign to Speech Converter',
                 color: Colors.blue.shade700,
               ),
             ),

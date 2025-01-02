@@ -447,6 +447,30 @@ class _RecordingPageState extends State<RecordingPage> {
                           value: "en-US",
                           child: Text("English"),
                         ),
+                        DropdownMenuItem<String>(
+                          value: "fr-FR",
+                          child: Text("French"),
+                        ),
+                        DropdownMenuItem<String>(
+                          value: "de-DE",
+                          child: Text("German"),
+                        ),
+                        DropdownMenuItem<String>(
+                          value: "nl-NL",
+                          child: Text("Dutch"),
+                        ),
+                        DropdownMenuItem<String>(
+                          value: "ar-AR",
+                          child: Text("Arabic"),
+                        ),
+                        DropdownMenuItem<String>(
+                          value: "it-IT",
+                          child: Text("Italian"),
+                        ),
+                        DropdownMenuItem<String>(
+                          value: "es-ES",
+                          child: Text("Spanish"),
+                        ),
                       ],
                     ),
                   ],

@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA"/>
     <application
-        android:label="comp_499_senior_project"
+        android:label="Sign Speak"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

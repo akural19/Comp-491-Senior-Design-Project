@@ -254,7 +254,7 @@ class _SignLanguageRecognitionResultPageState
 
     if (text.contains(':')) {
       // Split the input string at the colon and return the second part (trimmed)
-      text = text.split(':').last.trim();
+      text.split(':').last.trim();
     }
     try {
       final apiKey =
@@ -271,7 +271,7 @@ class _SignLanguageRecognitionResultPageState
         body: jsonEncode({
           "model": "tts-1",
           "voice": "alloy",
-          "input": "Sign Recognition Result is: " + text,
+          "input": text,
         }),
       );
 
@@ -309,7 +309,10 @@ class _SignLanguageRecognitionResultPageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sign Language Recognition Result'),
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text('Sign Language Recognition'),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
