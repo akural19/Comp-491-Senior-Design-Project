@@ -135,6 +135,7 @@ class _RecordingPageState extends State<RecordingPage>
         barrierDismissible: false, // Prevent closing dialog during processing
         builder: (BuildContext context) {
           return Dialog(
+            backgroundColor: const Color(0xFF12182A),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -516,6 +517,7 @@ class _RecordingPageState extends State<RecordingPage>
           return StatefulBuilder(
             builder: (context, setDialogState) {
               return AlertDialog(
+                backgroundColor: const Color(0xFF12182A),
                 title: const Text("Select Language"),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,

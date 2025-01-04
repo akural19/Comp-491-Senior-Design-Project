@@ -49,6 +49,7 @@ class _VideoRecordingPageState extends State<VideoRecordingPage> {
   }
 
   /// Check Permissions and Initialize Camera
+  /*
   Future<void> _checkPermissionsAndInitializeCamera() async {
     final cameraStatus = await Permission.camera.request();
     final microphoneStatus = await Permission.microphone.request();
@@ -66,12 +67,50 @@ class _VideoRecordingPageState extends State<VideoRecordingPage> {
       Navigator.of(context).pop(); // Go back to the previous screen
     }
   }
+   */
+
+  Future<void> _checkPermissionsAndInitializeCamera() async {
+    final cameraStatus = await Permission.camera.request();
+    //final microphoneStatus = await Permission.microphone.request();
+
+    if (cameraStatus.isGranted) {
+      _initializeCameras();
+    } else {
+      if (cameraStatus.isPermanentlyDenied) {
+        _showPermissionSettingsSnackBar();
+      } else {
+        _showSnackBar("Camera and Microphone permissions are required.");
+      }
+
+      Navigator.of(context).pop(); // Go back to the previous screen
+    }
+  }
 
   /// Initialize Cameras
+  /*
   Future<void> _initializeCameras() async {
     try {
       _cameras = await availableCameras(); // Fetch all available cameras
       _initializeCamera(_cameras![_currentCameraIndex]);
+    } catch (e) {
+      _showSnackBar("Failed to initialize cameras.");
+    }
+  }
+   */
+  Future<void> _initializeCameras() async {
+    try {
+      _cameras = await availableCameras(); // Fetch all available cameras
+
+      // Find the front camera
+      final frontCamera = _cameras?.firstWhere(
+        (camera) => camera.lensDirection == CameraLensDirection.front,
+        orElse: () =>
+            _cameras![0], // Fallback to the first camera if no front camera
+      );
+
+      // Set the current camera index and initialize
+      _currentCameraIndex = _cameras?.indexOf(frontCamera!) ?? 0;
+      await _initializeCamera(frontCamera!);
     } catch (e) {
       _showSnackBar("Failed to initialize cameras.");
     }

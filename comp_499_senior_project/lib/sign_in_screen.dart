@@ -90,6 +90,7 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF12182A),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
