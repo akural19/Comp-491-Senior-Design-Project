@@ -9,7 +9,7 @@ class SignRecognitionService {
   static const String baseUrl =
       'https://sign-recognizer-ca63fe2f6b41.herokuapp.com';
   static const int maxRetries = 30;
-  static const Duration retryDelay = Duration(seconds: 4);
+  static const Duration retryDelay = Duration(seconds: 3);
 
   static Future<int> uploadVideo(File videoFile) async {
     int retryCount = 0;
@@ -82,7 +82,7 @@ class SignRecognitionService {
   }
 
   static Future<Map<String, dynamic>> getResult(int videoId) async {
-    await Future.delayed(Duration(seconds: 8));
+    await Future.delayed(Duration(seconds: 4));
     String statusUrl = '$baseUrl/api/status/$videoId/';
 
     for (int attempt = 0; attempt < maxRetries; attempt++) {
@@ -110,7 +110,6 @@ class SignRecognitionService {
         rethrow;
       }
     }
-
     throw TimeoutException('Video processing timed out');
   }
 }

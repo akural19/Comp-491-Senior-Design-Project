@@ -100,11 +100,15 @@ class _RecordingPageState extends State<RecordingPage>
       } else {
         // Start recording
         final directory = await getApplicationDocumentsDirectory();
-        _recordingPath ??= "${directory.path}/recording.wav";
+        _recordingPath ??=
+            "${directory.path}/recording.${Platform.isIOS ? 'm4a' : 'wav'}";
+        //_recordingPath ??= "${directory.path}/recording.wav";
 
         await _recorder.startRecorder(
           toFile: _recordingPath,
-          codec: Codec.pcm16WAV,
+          codec: Platform.isIOS ? Codec.aacMP4 : Codec.pcm16WAV,
+          bitRate: Platform.isIOS ? 64000 : 16000,
+          sampleRate: 44100,
         );
       }
 
@@ -165,7 +169,7 @@ class _RecordingPageState extends State<RecordingPage>
 
     // Wait for the file to be saved
 
-    await Future.delayed(const Duration(seconds: 15));
+    await Future.delayed(const Duration(seconds: 8));
     // Ensure the file exists and is saved
     if (_recordingPath != null) {
       file = File(_recordingPath!);
@@ -211,6 +215,9 @@ class _RecordingPageState extends State<RecordingPage>
 
   Future<void> _uploadAndTranscribe(File file, String language) async {
     try {
+      final isIOS = Platform.isIOS;
+      final contentType = isIOS ? 'audio/m4a' : 'audio/wav';
+      final fileName = isIOS ? 'recording.m4a' : 'recording.wav';
       // Step 1: Obtain Upload URL
       final url = Uri.parse(
           'https://api.tor.app/developer/transcription/local_file/get_upload_url');
@@ -218,7 +225,7 @@ class _RecordingPageState extends State<RecordingPage>
       request.headers
         ..set('Content-Type', 'application/json')
         ..set('Authorization', 'Bearer $apiKey');
-      request.add(utf8.encode(jsonEncode({'file_name': 'recording.wav'})));
+      request.add(utf8.encode(jsonEncode({'file_name': fileName})));
 
       final response = await request.close();
       if (response.statusCode == 200) {
@@ -229,7 +236,7 @@ class _RecordingPageState extends State<RecordingPage>
 
         // Step 2: Upload the File
         final uploadRequest = await HttpClient().putUrl(Uri.parse(uploadUrl));
-        uploadRequest.headers.set('Content-Type', 'audio/wav');
+        uploadRequest.headers.set('Content-Type', contentType);
         final fileBytes = await file.readAsBytes();
         uploadRequest.headers.set('Content-Length',
             fileBytes.length.toString()); // Set Content-Length
@@ -316,7 +323,7 @@ class _RecordingPageState extends State<RecordingPage>
         Uri.parse('https://api.tor.app/developer/files/$orderId/content');
     const maxRetries =
         12; // Maximum retries (e.g., 12 retries = 1 minute polling)
-    const retryDelay = Duration(seconds: 5); // Delay between retries
+    const retryDelay = Duration(seconds: 4); // Delay between retries
     int retryCount = 0;
 
     if (_isPolling) {
@@ -386,35 +393,6 @@ class _RecordingPageState extends State<RecordingPage>
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                /*
-                children: [
-                  // Timer Counter
-                  Text(
-                    _formatDuration(_recordingDuration),
-                    style: const TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-
-                  // Record/Pause Button
-                  ElevatedButton(
-                    onPressed: _startOrPauseRecording,
-                    style: ElevatedButton.styleFrom(
-                      shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(20),
-                      backgroundColor: _isRecording ? Colors.red : Colors.green,
-                    ),
-                    child: Icon(
-                      _isRecording ? Icons.pause : Icons.mic,
-                      size: 48,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-                 */
                 children: [
                   RichText(
                     text: TextSpan(

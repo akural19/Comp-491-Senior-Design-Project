@@ -39,6 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF12182A),
       body: Center(
         child: Image.asset(
           'assets/sign_speak_nobg.png', // Change this to 'assets/sign_speak_nobg.png' if preferred

@@ -160,6 +160,7 @@ class _VideoPreviewPageState extends State<VideoPreviewPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
         );
+        //_displaySignLanguageRecognitionResult({"error": "$e"});
       }
     } finally {
       setState(() {
@@ -167,83 +168,6 @@ class _VideoPreviewPageState extends State<VideoPreviewPage> {
       });
     }
   }
-
-  /*
-  Future<void> _displaySignLanguageRecognitionResult(
-      Map<String, dynamic> result) async {
-    setState(() {
-      _isProcessing = true;
-    });
-
-    try {
-      // Show progress dialog
-      if (mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return const Dialog(
-              child: Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 20),
-                    Text(
-                      'Processing video...',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      }
-
-      // Display the sign language recognition result
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Sign Language Recognition Result'),
-              content: Text(
-                result['result'] ?? 'null',
-                style: const TextStyle(fontFamily: 'MonospaceFont'),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      }
-    } catch (e) {
-      // Close the progress dialog if open
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
-
-      // Show an error message
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
-    } finally {
-      setState(() {
-        _isProcessing = false;
-      });
-    }
-  }
-  */
 
   Future<void> _displaySignLanguageRecognitionResult(
       Map<String, dynamic> result) async {
@@ -279,7 +203,9 @@ class _VideoPreviewPageState extends State<VideoPreviewPage> {
       }
       // Fetch the GPT API response
       String correctedText = await _fetchGPTResponse(result['result']);
+      //String correctedText = "Alphabet";
       // Navigate to the new SignLanguageRecognitionResultPage
+      await Future.delayed(Duration(seconds: 1));
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(

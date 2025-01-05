@@ -20,139 +20,20 @@ class _RealTimeTranscriptionPageState extends State<RealTimeTranscriptionPage> {
     _speechToText = stt.SpeechToText();
   }
 
-  /*
-  Future<void> _startListening() async {
-    // Initialize the SpeechToText instance
-    bool available = await _speechToText.initialize(
-      onStatus: (status) {
-        print('Status: $status');
-        if (status == 'done' || status == 'notListening') {
-          setState(() {
-            _isListening = false;
-          });
-        }
-      },
-      onError: (error) {
-        print('Error: ${error.errorMsg}');
-        setState(() {
-          _isListening = false;
-          _transcription = "Error occurred: ${error.errorMsg}";
-        });
-      },
-    );
-
-    if (available) {
-      setState(() {
-        _isListening = true;
-        _transcription = ""; // Clear previous transcription
-      });
-      _speechToText.listen(
-        onResult: (result) {
-          setState(() {
-            _transcription = result.recognizedWords;
-          });
-        },
-        listenMode: stt.ListenMode.dictation, // Enable continuous listening
-      );
-    } else {
-      setState(() {
-        _isListening = false;
-        _transcription = "Speech recognition not available.";
-      });
-    }
-  }
-   */
-  /*
-  Future<void> _startListening() async {
-    bool available = await _speechToText.initialize(
-      onStatus: (status) {
-        print('Status: $status');
-        if (status == 'done' || status == 'notListening') {
-          // Ensure the mic remains on after stopping
-          setState(() {
-            _isListening = false;
-          });
-        }
-      },
-      onError: (error) {
-        print('Error: ${error.errorMsg}');
-        setState(() {
-          _isListening = false;
-          _transcriptionSegments.add("Error: ${error.errorMsg}");
-        });
-      },
-    );
-
-    if (available) {
-      setState(() {
-        _isListening = true;
-      });
-      _speechToText.listen(
-        onResult: (result) {
-          if (result.finalResult) {
-            setState(() {
-              // Add final recognized words to the list
-              _transcriptionSegments.add(result.recognizedWords);
-            });
-          }
-        },
-        listenMode: stt.ListenMode.dictation,
-        pauseFor: const Duration(seconds: 3), // Adjust pause time
-        partialResults: false, // Only handle final results
-      );
-    } else {
-      setState(() {
-        _isListening = false;
-        _transcriptionSegments.add("Speech recognition not available.");
-      });
-    }
-  }
-  */
-
-  /*
-  Future<void> _startListening() async {
-    bool available = await _speechToText.initialize(
-      onStatus: (status) {
-        print('Status: $status');
-      },
-      onError: (error) {
-        print('Error: ${error.errorMsg}');
-        setState(() {
-          _isListening = false;
-        });
-      },
-    );
-
-    if (available) {
-      setState(() {
-        _isListening = true;
-      });
-      _speechToText.listen(
-        onResult: (result) {
-          setState(() {
-            _transcription += result.recognizedWords;
-          });
-        },
-        listenMode: stt.ListenMode.dictation,
-        pauseFor: const Duration(seconds: 5), // Continuous listening
-        partialResults: true, // Show partial results while listening
-      );
-    } else {
-      setState(() {
-        _isListening = false;
-      });
-    }
-  }
-   */
   Future<void> _startListening() async {
     bool available = await _speechToText.initialize(
       onStatus: (status) {
         print('Status: $status');
         if (status == 'notListening') {
           // Restart listening automatically if it stops
+
           if (_isListening) {
             _startListening();
           }
+        } else if (status == 'done') {
+          setState(() {
+            _isListening = false;
+          });
         }
       },
       onError: (error) {
@@ -176,7 +57,7 @@ class _RealTimeTranscriptionPageState extends State<RealTimeTranscriptionPage> {
           });
         },
         listenMode: stt.ListenMode.dictation,
-        pauseFor: const Duration(seconds: 5),
+        pauseFor: const Duration(seconds: 10),
         partialResults: true,
       );
     } else {

@@ -6,7 +6,7 @@ class TranscriptionInProgressScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black87,
+      backgroundColor: const Color(0xFF12182A),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
