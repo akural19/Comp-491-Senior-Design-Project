@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:comp_499_senior_project/transcription_in_progress_screen.dart';
 import 'package:comp_499_senior_project/transcription_result.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -24,8 +25,7 @@ class _RecordingPageState extends State<RecordingPage>
   int _recordingDuration = 0; // Timer for recording duration
   Timer? _timer;
   bool _isPolling = false;
-  final String apiKey =
-      'd166c6edfc36e49e6bd9f2bca6f2955c29cb66672b5decc4e52d1be935f0f72719478c626e0e0ef62125d5e867f8e46c645e6e69650372ebccace84371e2d746'; // Replace with your actual API key
+  String? apiKey = dotenv.env['TRANSKRIPTOR_API_KEY'];
 
   late AnimationController _animationController;
   bool _isTranscribing = false;

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:comp_499_senior_project/sign_recognition_result.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:video_player/video_player.dart';
 
@@ -236,8 +237,12 @@ class _VideoPreviewPageState extends State<VideoPreviewPage> {
   }
 
   Future<String> _fetchGPTResponse(String text) async {
-    final apiKey =
-        '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';
+    String? apiKey = dotenv.env['CHATGPT_API_KEY'];
+
+    if (apiKey == null) {
+      print("API key not found!");
+      return text;
+    }
     final apiUrl = 'https://api.openai.com/v1/chat/completions';
 
     try {

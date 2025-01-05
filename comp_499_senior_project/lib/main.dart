@@ -2,6 +2,7 @@ import 'package:comp_499_senior_project/firebase_options.dart';
 import 'package:comp_499_senior_project/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
@@ -24,6 +25,7 @@ Future<void> main() async {
     print("Firebase initialized successfully"); // Initialize Firebase
   }
    */
+  await dotenv.load();
   final prefs = await SharedPreferences.getInstance();
   final showOnboarding = prefs.getBool('showOnboarding') ?? true;
   runApp(SignSpeakApp(showOnboarding: showOnboarding));
