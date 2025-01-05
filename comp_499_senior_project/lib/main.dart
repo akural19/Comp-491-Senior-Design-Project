@@ -25,9 +25,10 @@ Future<void> main() async {
     print("Firebase initialized successfully"); // Initialize Firebase
   }
    */
-  await dotenv.load();
+
   final prefs = await SharedPreferences.getInstance();
   final showOnboarding = prefs.getBool('showOnboarding') ?? true;
+  await dotenv.load(fileName: ".env");
   runApp(SignSpeakApp(showOnboarding: showOnboarding));
 }
 
